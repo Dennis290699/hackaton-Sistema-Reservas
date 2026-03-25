@@ -7,13 +7,15 @@ export interface LoginCredentials {
 
 export interface AuthResponse {
     message?: string;
+    error?: string;
     token?: string;
-    user?: {
-        id: number;
-        nombre: string;
-        correoElectronico: string;
-        esAdmin: boolean;
-    };
+    role?: string;
+    full_name?: string;
+}
+
+export interface AdminUser {
+    full_name: string;
+    role: string;
 }
 
 class AuthServiceFacade {
@@ -25,9 +27,11 @@ class AuthServiceFacade {
         const response = await api.post<AuthResponse>('/auth/login', payload);
         if (response.token && typeof window !== 'undefined') {
             localStorage.setItem('admin_token', response.token);
-            if (response.user) {
-                localStorage.setItem('admin_user', JSON.stringify(response.user));
-            }
+            const user: AdminUser = {
+                full_name: response.full_name || '',
+                role: response.role || 'admin',
+            };
+            localStorage.setItem('admin_user', JSON.stringify(user));
         }
         return response;
     }
@@ -45,7 +49,7 @@ class AuthServiceFacade {
         return !!localStorage.getItem('admin_token');
     }
 
-    getCurrentUser(): AuthResponse['user'] | null {
+    getCurrentUser(): AdminUser | null {
         if (typeof window === 'undefined') return null;
         const userStr = localStorage.getItem('admin_user');
         if (!userStr) return null;
