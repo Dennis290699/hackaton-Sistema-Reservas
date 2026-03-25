@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import { Settings, Bell, X, Trash2, History } from "lucide-react";
 import { toast } from "sonner";
-import { AuthService, AuthResponse } from "@/services/auth.service";
+import { AuthService, AdminUser } from "@/services/auth.service";
 import { useNotificationStore } from "@/store/notificationsStore";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 
 export function TopHeader() {
-    const [user, setUser] = useState<AuthResponse['user'] | null>(null);
+    const [user, setUser] = useState<AdminUser | null>(null);
     const { notifications, unreadCount, clearUnread, removeNotification, clearAllNotifications } = useNotificationStore();
 
     useEffect(() => {
@@ -41,12 +41,12 @@ export function TopHeader() {
                 <div className="flex items-center gap-4">
                     <div className="relative w-12 h-12 rounded-full overflow-hidden bg-[#2A3B32] border-2 border-[#D3FB52] flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(211,251,82,0.2)]">
                         <span className="text-[#D3FB52] font-bold text-lg tracking-wider">
-                            {getInitials(user?.nombre)}
+                            {getInitials(user?.full_name)}
                         </span>
                     </div>
                     <div>
                         <h2 className="text-lg font-bold text-white whitespace-nowrap">
-                            {getGreeting()}, <span className="text-[#D3FB52]">{user ? user.nombre.split(" ")[0] : "Admin"}</span>
+                            {getGreeting()}, <span className="text-[#D3FB52]">{user ? user.full_name.split(" ")[0] : "Admin"}</span>
                         </h2>
                         <p className="text-sm text-zinc-400 font-medium">Administrador del Sistema</p>
                     </div>
