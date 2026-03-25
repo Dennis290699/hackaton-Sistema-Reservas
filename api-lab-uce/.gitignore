@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Production Build
+dist/
+
+# Environment Variables
+.env
+.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Docs
+docs/
+
+# Database Schemas and Scripts (Añadido por solicitud)
+# migrations/
+# scripts/
