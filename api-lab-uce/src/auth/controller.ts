@@ -32,10 +32,14 @@ export const login = async (req: Request, res: Response) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        // --- NEW AUTHORIZATION CHECK ---
-        // If the user's state was toggled to inactive by an Administrator, block entry unconditionally
+        // Block inactive accounts
         if (user.estado === 'inactivo') {
             return res.status(403).json({ error: 'Cuenta Inhabilitada. Contacte con el Administrador.' });
+        }
+
+        // Admin dashboard endpoint: only allow admin users
+        if (user.role !== 'admin') {
+            return res.status(403).json({ error: 'Acceso denegado. Solo administradores pueden acceder a este panel.' });
         }
 
         const token = jwt.sign(
