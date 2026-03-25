@@ -121,8 +121,8 @@ export default function InicioPage() {
 
     useEffect(() => {
         const user = AuthService.getCurrentUser();
-        if (user && user.nombre) {
-            setAdminName(user.nombre);
+        if (user && user.full_name) {
+            setAdminName(user.full_name);
         }
 
         // Initial fetch showing loaders
