@@ -56,6 +56,6 @@ app.use('/labs', labsRoutes);
 app.use('/users', usersRoutes);
 app.use('/settings', settingsRoutes);
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+app.listen(Number(port), '0.0.0.0', () => {
+    console.log(`Server running at http://0.0.0.0:${port}`);
 });
