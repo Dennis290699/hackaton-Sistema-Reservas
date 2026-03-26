@@ -37,7 +37,44 @@ export const login = async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Cuenta Inhabilitada. Contacte con el Administrador.' });
         }
 
-        // Admin dashboard endpoint: only allow admin users
+
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({ token, role: user.role, full_name: user.full_name });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const adminLogin = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    try {
+        const user = await getUserByEmail(email);
+
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const match = await bcrypt.compare(password, user.password_hash);
+
+        if (!match) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        if (user.estado === 'inactivo') {
+            return res.status(403).json({ error: 'Cuenta Inhabilitada. Contacte con el Administrador.' });
+        }
+
         if (user.role !== 'admin') {
             return res.status(403).json({ error: 'Acceso denegado. Solo administradores pueden acceder a este panel.' });
         }
@@ -50,7 +87,7 @@ export const login = async (req: Request, res: Response) => {
 
         res.json({ token, role: user.role, full_name: user.full_name });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('Admin login error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
