@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import { LabService, Lab } from "@/services/lab.service";
 import { motion, Variants } from "framer-motion";
-import { Search, MonitorPlay, Users, MapPin, Plus, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { Search, MonitorPlay, Users, MapPin, Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export default function LaboratoriosPage() {
@@ -17,6 +16,11 @@ export default function LaboratoriosPage() {
     // Modal States
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingLab, setEditingLab] = useState<Lab | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Delete confirm modal
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [labToDelete, setLabToDelete] = useState<Lab | null>(null);
 
     // Form States
     const [formData, setFormData] = useState({
@@ -83,6 +87,7 @@ export default function LaboratoriosPage() {
             return toast.error("Por favor completa los campos principales correctamente.");
         }
 
+        setIsSaving(true);
         try {
             if (editingLab) {
                 await LabService.updateLab(editingLab.id, formData);
@@ -95,17 +100,27 @@ export default function LaboratoriosPage() {
             fetchData();
         } catch (error: any) {
             toast.error(error.response?.data?.error || "Ocurrió un error al guardar el laboratorio.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
-    const handleDeleteLab = async (id: number) => {
-        if (!window.confirm("¿Seguro que deseas eliminar el registro de este laboratorio? Esta acción solo es posible si no existen reservas registradas a su nombre.")) return;
+    const handleRequestDelete = (lab: Lab) => {
+        setLabToDelete(lab);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!labToDelete) return;
+        setIsDeleteModalOpen(false);
         try {
-            await LabService.deleteLab(id);
+            await LabService.deleteLab(labToDelete.id);
             toast.success("Laboratorio eliminado con éxito.");
             fetchData();
         } catch (error: any) {
             toast.error(error.response?.data?.error || "Error al eliminar. Verifique que no existan reservas vinculadas.");
+        } finally {
+            setLabToDelete(null);
         }
     };
 
@@ -215,7 +230,7 @@ export default function LaboratoriosPage() {
                                             <Edit className="w-4 h-4" />
                                         </button>
                                         <button
-                                            onClick={() => handleDeleteLab(lab.id)}
+                                            onClick={() => handleRequestDelete(lab)}
                                             className="p-2 bg-[#0D1310] hover:bg-red-950/50 border border-[#1C2721] hover:border-red-900/50 text-zinc-400 hover:text-red-400 rounded-lg transition-all"
                                             title="Eliminar"
                                         >
@@ -296,11 +311,40 @@ export default function LaboratoriosPage() {
                     </div>
 
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-transparent text-zinc-400 hover:text-white transition-colors">
+                        <button onClick={() => setIsModalOpen(false)} disabled={isSaving} className="px-4 py-2 bg-transparent text-zinc-400 hover:text-white transition-colors disabled:opacity-50">
                             Cancelar
                         </button>
-                        <button onClick={handleSaveLab} className="px-4 py-2 bg-[#D3FB52] hover:bg-[#bceb3b] text-black font-semibold rounded-lg transition-colors">
-                            Guardar Cambios
+                        <button
+                            onClick={handleSaveLab}
+                            disabled={isSaving}
+                            className="px-4 py-2 bg-[#D3FB52] hover:bg-[#bceb3b] text-black font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {isSaving && <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-black" />}
+                            {isSaving ? (editingLab ? "Guardando..." : "Creando...") : "Guardar Cambios"}
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            {/* Delete Confirmation Modal */}
+            <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                <DialogContent className="bg-[#0D1310] border-red-900/50 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl flex items-center gap-2 text-red-400">
+                            <AlertTriangle className="w-5 h-5" /> Eliminar Laboratorio
+                        </DialogTitle>
+                        <DialogDescription className="text-zinc-400 pt-2">
+                            Estas a punto de eliminar permanentemente <span className="text-white font-semibold">{labToDelete?.nombre}</span>. Esta accion solo es posible si no existen reservas registradas a su nombre y no se puede deshacer.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0 mt-4">
+                        <button onClick={() => setIsDeleteModalOpen(false)} className="px-4 py-2 bg-transparent text-zinc-400 hover:text-white transition-colors">
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleConfirmDelete}
+                            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                        >
+                            <Trash2 className="w-4 h-4" /> Confirmar Eliminacion
                         </button>
                     </DialogFooter>
                 </DialogContent>
