@@ -287,10 +287,14 @@ export default function LaboratoriosPage() {
                             <div className="space-y-3 w-1/2">
                                 <label className="block text-sm font-medium text-zinc-300">Capacidad (Estudiantes)</label>
                                 <input
-                                    type="number"
-                                    min="1"
-                                    value={formData.capacidad}
-                                    onChange={(e) => setFormData({ ...formData, capacidad: Number(e.target.value) })}
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={formData.capacidad === 0 ? "" : String(formData.capacidad)}
+                                    onChange={(e) => {
+                                        const raw = e.target.value.replace(/\D/g, "");
+                                        setFormData({ ...formData, capacidad: raw === "" ? 0 : parseInt(raw, 10) });
+                                    }}
+                                    placeholder="Ej: 30"
                                     className="w-full bg-[#141C18] border border-[#2A3B32] p-3 rounded-lg text-white outline-none focus:border-[#D3FB52] transition-colors"
                                 />
                             </div>
