@@ -24,7 +24,7 @@ class AuthServiceFacade {
             email: credentials.correoElectronico,
             password: credentials.contrasena,
         };
-        const response = await api.post<AuthResponse>('/auth/login', payload);
+        const response = await api.post<AuthResponse>('/auth/admin-login', payload);
         if (response.token && typeof window !== 'undefined') {
             localStorage.setItem('admin_token', response.token);
             const user: AdminUser = {
