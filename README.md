@@ -12,7 +12,7 @@
 
 ## 1\. Contexto y Problema a Resolver
 
-En la Universidad Central del Ecuador (UCE), la gestión de reservas de los laboratorios se realiza tradicionalmente de forma manual, utilizando registros en papel o en hojas de cálculo de Excel. Este enfoque requiere que el estudiante se acerque de manera presencial a las instalaciones para verificar la disponibilidad y asegurar su reserva, lo cual genera ineficiencias, cruce de horarios y una pérdida significativa de tiempo tanto para el alumnado como para el personal administrativo.
+En la Universidad Central del Ecuador (UCE), lugar donde realizo mi formación academica profesional, la gestión de reservas de los laboratorios se realiza tradicionalmente de forma manual, utilizando registros en papel o en hojas de cálculo de Excel. Este enfoque requiere que el estudiante se acerque de manera presencial a las instalaciones para verificar la disponibilidad y asegurar su reserva, lo cual genera ineficiencias, cruce de horarios y una pérdida significativa de tiempo tanto para el alumnado como para el personal administrativo.
 
 ## 2\. La Solución
 
