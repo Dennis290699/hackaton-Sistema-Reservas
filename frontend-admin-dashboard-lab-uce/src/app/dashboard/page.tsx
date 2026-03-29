@@ -22,9 +22,12 @@ export default function InicioPage() {
     // Modal States
     const [viewModalOpen, setViewModalOpen] = useState(false);
     const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false);
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+    const [reservationToDelete, setReservationToDelete] = useState<Reservation | null>(null);
     const [rescheduleDate, setRescheduleDate] = useState("");
     const [rescheduleTime, setRescheduleTime] = useState<number>(7);
+    const [isSaving, setIsSaving] = useState(false);
 
     const fetchDashboardData = async (silent = false) => {
         try {
@@ -97,25 +100,35 @@ export default function InicioPage() {
 
     const handleRescheduleSubmit = async () => {
         if (!selectedReservation || !rescheduleDate || !rescheduleTime) return;
-
+        setIsSaving(true);
         try {
             await LabService.rescheduleReservation(selectedReservation.id, rescheduleDate, Number(rescheduleTime));
             toast.success("Reserva modificada exitosamente.");
             setRescheduleModalOpen(false);
-            fetchDashboardData(true); // background silent refresh
+            fetchDashboardData(true);
         } catch (error: any) {
             toast.error(error.response?.data?.error || "Error al intentar reagendar. Comprueba que el horario esté libre.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
-    const handleDeleteReservation = async (id: number) => {
-        if (!window.confirm("¿Estás seguro de que deseas cancelar esta reserva? Esta acción no se puede deshacer.")) return;
+    const handleRequestDelete = (res: Reservation) => {
+        setReservationToDelete(res);
+        setDeleteConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!reservationToDelete) return;
+        setDeleteConfirmOpen(false);
         try {
-            await LabService.cancelReservation(id);
+            await LabService.adminCancelReservation(reservationToDelete.id);
             toast.success("Reserva cancelada y eliminada del sistema.");
             fetchDashboardData(true);
         } catch (error: any) {
             toast.error(error.response?.data?.error || "Error al cancelar la reserva.");
+        } finally {
+            setReservationToDelete(null);
         }
     };
 
@@ -326,7 +339,7 @@ export default function InicioPage() {
                                                                     <Edit className="w-4 h-4" />
                                                                 </button>
                                                                 <button
-                                                                    onClick={() => handleDeleteReservation(res.id)}
+                                                                    onClick={() => handleRequestDelete(res)}
                                                                     className="p-2 bg-[#1C2721] hover:bg-red-950 text-zinc-400 hover:text-red-400 rounded-lg transition-colors border border-[#2A3B32] hover:border-red-900"
                                                                     title="Cancelar reserva"
                                                                 >
@@ -430,11 +443,39 @@ export default function InicioPage() {
                         </div>
                     )}
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <button onClick={() => setRescheduleModalOpen(false)} className="px-4 py-2 bg-transparent text-zinc-400 hover:text-white transition-colors">
+                        <button onClick={() => setRescheduleModalOpen(false)} disabled={isSaving} className="px-4 py-2 bg-transparent text-zinc-400 hover:text-white transition-colors disabled:opacity-50">
                             Cancelar
                         </button>
-                        <button onClick={handleRescheduleSubmit} className="px-4 py-2 bg-[#D3FB52] hover:bg-[#bceb3b] text-black font-semibold rounded-lg transition-colors">
-                            Guardar Cambios
+                        <button
+                            onClick={handleRescheduleSubmit}
+                            disabled={isSaving}
+                            className="px-4 py-2 bg-[#D3FB52] hover:bg-[#bceb3b] text-black font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {isSaving && <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-black" />}
+                            {isSaving ? "Guardando..." : "Guardar Cambios"}
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+                <DialogContent className="bg-[#0D1310] border-red-900/50 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl flex items-center gap-2 text-red-400">
+                            <Trash2 className="w-5 h-5" /> Cancelar Reserva
+                        </DialogTitle>
+                        <DialogDescription className="text-zinc-400 pt-2">
+                            Estas a punto de cancelar la reserva de <span className="text-white font-semibold">{reservationToDelete?.user_nombre || 'este usuario'}</span> en <span className="text-white font-semibold">{reservationToDelete?.lab_nombre || 'el laboratorio'}</span>. Esta accion no se puede deshacer.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0 mt-4">
+                        <button onClick={() => setDeleteConfirmOpen(false)} className="px-4 py-2 bg-transparent text-zinc-400 hover:text-white transition-colors">
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleConfirmDelete}
+                            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                        >
+                            <Trash2 className="w-4 h-4" /> Confirmar Cancelacion
                         </button>
                     </DialogFooter>
                 </DialogContent>

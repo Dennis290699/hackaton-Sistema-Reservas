@@ -99,6 +99,14 @@ class LabServiceFacade {
     }
 
     /**
+     * Cancel a reservation as admin (bypasses user_id ownership check).
+     * DELETE /labs/reservas/:id/admin
+     */
+    async adminCancelReservation(id: number): Promise<{ message: string }> {
+        return api.delete<{ message: string }>(`/labs/reservas/${id}/admin`);
+    }
+
+    /**
      * Reschedule an existing reservation.
      * PATCH /labs/reservas/:id/reagendar
      */
