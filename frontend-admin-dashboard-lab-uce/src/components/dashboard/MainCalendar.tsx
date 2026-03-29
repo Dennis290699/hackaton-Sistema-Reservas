@@ -28,6 +28,7 @@ export function MainCalendar({ currentViewDate: externalDate, setCurrentViewDate
 
     const [viewReservation, setViewReservation] = useState<Reservation | null>(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isDeletingReservation, setIsDeletingReservation] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [listFilter, setListFilter] = useState<'day' | 'week' | 'month'>('month');
 
@@ -107,16 +108,17 @@ export function MainCalendar({ currentViewDate: externalDate, setCurrentViewDate
     };
 
     const handleDeleteReservation = async (id: number) => {
-        if (confirm("¿Estás seguro de que deseas cancelar esta reserva?")) {
-            try {
-                await LabService.cancelReservation(id);
-                toast.success("Reserva cancelada exitosamente");
-                setIsViewModalOpen(false);
-                refreshData();
-            } catch (error) {
-                console.error(error);
-                toast.error("Error al cancelar la reserva");
-            }
+        setIsDeletingReservation(true);
+        try {
+            await LabService.adminCancelReservation(id);
+            toast.success("Reserva cancelada exitosamente");
+            setIsViewModalOpen(false);
+            refreshData();
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al cancelar la reserva");
+        } finally {
+            setIsDeletingReservation(false);
         }
     };
 
@@ -558,6 +560,7 @@ export function MainCalendar({ currentViewDate: externalDate, setCurrentViewDate
                 onClose={() => setIsViewModalOpen(false)}
                 reservation={viewReservation}
                 onDelete={handleDeleteReservation}
+                isDeleting={isDeletingReservation}
             />
         </div>
     );
