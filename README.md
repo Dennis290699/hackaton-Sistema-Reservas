@@ -46,12 +46,30 @@ El despliegue del proyecto se diseñó bajo una arquitectura distribuida para ga
 
 -----
 
-## 5\. Capturas de Pantalla del Sistema
+## 5. Capturas de Pantalla del Sistema
 
 ### Panel de Usuarios (Estudiantes)
 
 > *Vista principal del estudiante: Gestión de reservas y avisos institucionales.*
+![Login](screenshots/usuarios/login.png)
+![Registro](screenshots/usuarios/register.png)
+![Inicio](screenshots/usuarios/Homepage.png)
+![Página de Reserva](screenshots/usuarios/PaginaReserva.png)
+![Asignación de Reserva](screenshots/usuarios/AsiganacionReserva.png)
+![Reservas Activas](screenshots/usuarios/ReservasActivas.png)
+![Reservas Ocupadas](screenshots/usuarios/ReservasOcupadas.png)
+![Resumen](screenshots/usuarios/ResumePage.png)
 
 ### Panel Administrativo
 
 > *Vista del administrador: Control total sobre laboratorios, usuarios y horarios.*
+![Login Admin](screenshots/admin/login.png)
+![Inicio Admin](screenshots/admin/homePage.png)
+![Calendario](screenshots/admin/calendarPage.png)
+![Laboratorios](screenshots/admin/labPage.png)
+![Usuarios](screenshots/admin/userPage.png)
+![Detalles de Usuario](screenshots/admin/userDetailsPage.png)
+![Historial](screenshots/admin/historyPage.png)
+![Historial Activo](screenshots/admin/historialReservasActivo.png)
+![Ajustes](screenshots/admin/settingsPage.png)
+![Vista Banner](screenshots/admin/VistaBannerActiva.png)
