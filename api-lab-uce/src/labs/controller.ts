@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getReservationsByDateAndLab, createReservations, getLabs, createLab, updateLab, deleteLab } from './db';
+import { getReservationsByDateAndLab, createReservations, getLabs, createLab, updateLab, deleteLab, deleteReservationAdmin } from './db';
 import { z } from 'zod';
 
 const reservationSchema = z.object({
@@ -194,6 +194,21 @@ export const cancelReservation = async (req: Request, res: Response) => {
     }
 };
 
+export const adminCancelReservation = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const deleted = await deleteReservationAdmin(Number(id));
+        if (deleted) {
+            res.json({ message: 'Reservation cancelled by admin successfully' });
+        } else {
+            res.status(404).json({ error: 'Reservation not found' });
+        }
+    } catch (error) {
+        console.error('Admin cancel booking error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 export const rescheduleReservation = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { fecha, hora_inicio } = req.body;

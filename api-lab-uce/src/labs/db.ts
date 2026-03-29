@@ -126,3 +126,11 @@ export const deleteReservation = async (id: number, userId: number): Promise<boo
     );
     return (result.rowCount ?? 0) > 0;
 };
+
+export const deleteReservationAdmin = async (id: number): Promise<boolean> => {
+    const result = await pool.query(
+        'DELETE FROM reservas WHERE id = $1 RETURNING id',
+        [id]
+    );
+    return (result.rowCount ?? 0) > 0;
+};
